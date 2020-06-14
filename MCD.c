@@ -34,17 +34,17 @@ char yesNo;
 int defenceValue = 0;//防御力
 int armorStrength = 0;//防具強度
 
-bool isExpectedInput(int min,int max,int value){
+bool isExpectedInput(int min,int max,int value){//T
    if((min <= value)&&(value <= max))return true;
    else return false;
 }
 
-bool yesNoJ(){
+bool yesNoJ(){//T
    if(yesNo == 'y')return true;
    else return false;
 }
 
-void display(bool debag){
+void display(bool debag){//V
    system("cls");
    for(int i = 0;i < DISPLAY_WIDTH;i++)printf("■");
    printf("\n");
