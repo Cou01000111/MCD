@@ -6,11 +6,11 @@
 #define NUMBER_OF_CHARACTERS_TO_READ 100
 
 #define NO_WEAPON_DAMAGE 1
-#define WOODEN_SWORD_DAMAGE 4
-#define GOLDEN_SWORD_DAMAGE 4
-#define STONE_SWORD_DAMAGE 5
-#define IRON_SWORD_DAMAGE 6
-#define DIAMOND_SWORD_DAMAGE 7
+#define WOODEN_SWORD_DAMAGE 3
+#define GOLDEN_SWORD_DAMAGE 3
+#define STONE_SWORD_DAMAGE 4
+#define IRON_SWORD_DAMAGE 5
+#define DIAMOND_SWORD_DAMAGE 6
 #define NUMBER_OF_WEAPONS 6
 
 #define MAX_SHARPNESS_ENCHANT_LEVEL 9999
@@ -53,19 +53,19 @@ typedef struct{
 dataSet data = {0};
 
 
-bool isExpectedIntInput(int min,int max,int value){//T
+bool isExpectedIntInput(int min,int max,int value){//valueがmin~maxならtrueを返す
    if((min <= value)&&(value <= max))return true;
    else return false;
 }
 
-bool isExpectedCharInput(char array[],char input){
+bool isExpectedCharInput(char array[],char input){//inputがarray[]のどれかと同じだったらtrueを返す
    for(int i = 0;i < strlen(array);i++){
       if(array[i] == input)return true;
    }
    return false;
 }
 
-bool yesNoJ(){//T
+bool yesNoJ(char yesNo){//yes
    if(yesNo == 'y')return true;
    else return false;
 }
@@ -99,27 +99,27 @@ int main(){
    char allowedChars[NUMBER_OF_WEAPONS] = {'n','w','g','s','i','d'};
    do{
       printf("メインウエポン：使用武器は？\n");
-      printf("[素手=n,木の剣/金の剣=w,石剣=s,鉄剣=i,ダイヤ剣＝d]:");
+      printf("[素手=n,木の剣=w,金の剣=g,石剣=s,鉄剣=i,ダイヤ剣＝d]:");
       scanf(" %c",&data.selectedWeapon);
    }while(!(isExpectedCharInput(allowedChars,data.selectedWeapon)));
+   data.offensivePower += NO_WEAPON_DAMAGE;
    switch (data.selectedWeapon){
    case 'n':
-      data.deffenceValue += NO_WEAPON_DAMAGE;
       break;
    case 'w':
-      data.deffenceValue += WOODEN_SWORD_DAMAGE;
+      data.offensivePower += WOODEN_SWORD_DAMAGE;
       break;
    case 'g':
-      data.deffenceValue += GOLDEN_SWORD_DAMAGE;
+      data.offensivePower += GOLDEN_SWORD_DAMAGE;
       break;
    case 's':
-      data.deffenceValue += STONE_SWORD_DAMAGE;
+      data.offensivePower += STONE_SWORD_DAMAGE;
       break;
    case 'i':
-      data.deffenceValue += IRON_SWORD_DAMAGE;
+      data.offensivePower += IRON_SWORD_DAMAGE;
       break;
    case 'd':
-      data.deffenceValue += DIAMOND_SWORD_DAMAGE;
+      data.offensivePower += DIAMOND_SWORD_DAMAGE;
       break;
    default:
       printf("エラーが発生しました。\n");
@@ -212,7 +212,7 @@ int main(){
             printf("これでよろしいでしょうか？[yes:y/no:n]");
             scanf(" %c",&yesNo);
          }while(!(yesNo == 'y' || yesNo == 'n'));
-      }while(!(yesNoJ()));
+      }while(!(yesNoJ(yesNo)));
    };
    //防御点-加算(ついでに防具強度計算)
    //Helmet
@@ -319,8 +319,6 @@ int main(){
    //終了処理
    display(DEBUG_SWITCH);
    printf("貴方が相手に与えられるダメージは %.8lf です\n",data.damage);
-
-
 
    getch();
    exit(0);
