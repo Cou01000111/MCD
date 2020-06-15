@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define NUMBER_OF_CHARACTERS_TO_READ 100
 
 #define NO_WEAPON_DAMAGE 1
 #define WOODEN_SWORD_DAMAGE 4
+#define GOLDEN_SWORD_DAMAGE 4
 #define STONE_SWORD_DAMAGE 5
 #define IRON_SWORD_DAMAGE 6
 #define DIAMOND_SWORD_DAMAGE 7
+#define NUMBER_OF_WEAPONS 6
 
 #define MAX_SHARPNESS_ENCHANT_LEVEL 9999
 #define MIN_SHARPNESS_ENCHANT_LEVEL 0
@@ -33,7 +36,7 @@ char yesNo;
 typedef struct{
    double offensivePower;
    double deffensivePower;
-   int defenceValue;//防御力
+   int deffenceValue;//防御力
    int armorStrength;//防具強度
    char selectedWeapon;
    double strengthLevel;
@@ -50,9 +53,16 @@ typedef struct{
 dataSet data = {0};
 
 
-bool isExpectedInput(int min,int max,int value){//T
+bool isExpectedIntInput(int min,int max,int value){//T
    if((min <= value)&&(value <= max))return true;
    else return false;
+}
+
+bool isExpectedCharInput(char array[],char input){
+   for(int i = 0;i < strlen(array);i++){
+      if(array[i] == input)return true;
+   }
+   return false;
 }
 
 bool yesNoJ(){//T
@@ -69,14 +79,16 @@ void display(bool debag){//V
    if(debag){
       printf("data.offensivePower:%lf\n",data.offensivePower);
       printf("data.deffensivePower:%lf\n",data.deffensivePower);
-      printf("defence value:%d\n",data.defenceValue);
+      printf("defence value:%d\n",data.deffenceValue);
       printf("armor strength:%d\n",data.armorStrength);
-      printf("(data.defenceValue/125):%lf\n",(data.defenceValue/125));
-      printf("((data.defenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25):%lf\n",((data.defenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
+      printf("(data.deffenceValue/125):%lf\n",(data.deffenceValue/125));
+      printf("((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25):%lf\n",((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
    }
    for(int i = 0;i < DISPLAY_WIDTH;i++)printf("■");
    printf("\n");
 }
+
+
 
 int main(){
    system("chcp 65001");
@@ -84,18 +96,36 @@ int main(){
 
 
    //武器
-   bool isExpectedCharInput = 1;
+   char allowedChars[NUMBER_OF_WEAPONS] = {'n','w','g','s','i','d'};
    do{
       printf("メインウエポン：使用武器は？\n");
       printf("[素手=n,木の剣/金の剣=w,石剣=s,鉄剣=i,ダイヤ剣＝d]:");
       scanf(" %c",&data.selectedWeapon);
-      if(data.selectedWeapon == 'n')data.offensivePower += NO_WEAPON_DAMAGE;
-      else if(data.selectedWeapon == 'w')data.offensivePower += WOODEN_SWORD_DAMAGE;
-      else if(data.selectedWeapon == 's')data.offensivePower += STONE_SWORD_DAMAGE;
-      else if(data.selectedWeapon == 'i')data.offensivePower += IRON_SWORD_DAMAGE;
-      else if(data.selectedWeapon == 'd')data.offensivePower += DIAMOND_SWORD_DAMAGE;
-      else isExpectedCharInput = 0;
-   }while(isExpectedCharInput != 1);
+   }while(!(isExpectedCharInput(allowedChars,data.selectedWeapon)));
+   switch (data.selectedWeapon){
+   case 'n':
+      data.deffenceValue += NO_WEAPON_DAMAGE;
+      break;
+   case 'w':
+      data.deffenceValue += WOODEN_SWORD_DAMAGE;
+      break;
+   case 'g':
+      data.deffenceValue += GOLDEN_SWORD_DAMAGE;
+      break;
+   case 's':
+      data.deffenceValue += STONE_SWORD_DAMAGE;
+      break;
+   case 'i':
+      data.deffenceValue += IRON_SWORD_DAMAGE;
+      break;
+   case 'd':
+      data.deffenceValue += DIAMOND_SWORD_DAMAGE;
+      break;
+   default:
+      printf("エラーが発生しました。\n");
+      exit(0);
+      break;
+   }
 
    display(DEBUG_SWITCH);
 
@@ -105,7 +135,7 @@ int main(){
          printf("エンチャント：使用武器の「ダメージ増加」のエンチャントレベルは？\n");
          printf("[0~9999の整数値]:");
          scanf("%d",&data.sharpnessEnchantLevel);
-      }while(!(isExpectedInput(MIN_SHARPNESS_ENCHANT_LEVEL , MAX_SHARPNESS_ENCHANT_LEVEL , data.sharpnessEnchantLevel)));
+      }while(!(isExpectedIntInput(MIN_SHARPNESS_ENCHANT_LEVEL , MAX_SHARPNESS_ENCHANT_LEVEL , data.sharpnessEnchantLevel)));
       data.offensivePower += data.sharpnessEnchantLevel*0.5;
    }
    display(DEBUG_SWITCH);
@@ -115,7 +145,7 @@ int main(){
       printf("エフェクト：攻撃力上昇のレベルは？\n");
       printf("[0~127の整数値]:");
       scanf("%lf",&data.strengthLevel);
-   }while(!(isExpectedInput(MIN_STRENGTH_LEVEL,MAX_STRENGTH_LEVEL,data.strengthLevel)));
+   }while(!(isExpectedIntInput(MIN_STRENGTH_LEVEL,MAX_STRENGTH_LEVEL,data.strengthLevel)));
    data.offensivePower += data.strengthLevel*0.5;
 
    display(DEBUG_SWITCH);
@@ -126,31 +156,31 @@ int main(){
       printf("敵の種類を選んでください\n");
       printf("[ゾンビ,ゾンビピックマン,村人ゾンビ,ハスク,ドラウンド:1\nマグマキューブ（小:2\nウィザー:3\nマグマキューブ（中）:4\nマグマキューブ（大）:5\n殺人ウサギ:6\nシュルカー（殻を閉じている時）:7\nその他:0]:");
       scanf("%d",&data.selectedEnemy);
-   }while(!(isExpectedInput(MIN_SELECTED_ENEMY,MAX_SELECTED_ENEMY,data.selectedEnemy)));
+   }while(!(isExpectedIntInput(MIN_SELECTED_ENEMY,MAX_SELECTED_ENEMY,data.selectedEnemy)));
    switch (data.selectedEnemy){
    case 0:
-      data.defenceValue += 0;
+      data.deffenceValue += 0;
       break;
    case 1:
-      data.defenceValue += 2;
+      data.deffenceValue += 2;
       break;
    case 2:
-      data.defenceValue += 3;
+      data.deffenceValue += 3;
       break;
    case 3:
-      data.defenceValue += 4;
+      data.deffenceValue += 4;
       break;
    case 4:
-      data.defenceValue += 6;
+      data.deffenceValue += 6;
       break;
    case 5:
-      data.defenceValue += 8;
+      data.deffenceValue += 8;
       break;
    case 6:
-      data.defenceValue += 12;
+      data.deffenceValue += 12;
       break;
    case 7:
-      data.defenceValue += 20;
+      data.deffenceValue += 20;
       break;
    };
 
@@ -164,19 +194,19 @@ int main(){
          do{
             printf("ヘルメット[なし:0,皮:1,チェーン:2,鉄:3,金:4,ダイヤ:5]:");
             scanf("%d",&data.selectedEnemyHelmet);
-         }while(!(isExpectedInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyHelmet)));
+         }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyHelmet)));
          do{
             printf("チェストプレート[なし:0,皮:1,チェーン:2,鉄:3,金:4,ダイヤ:5]:");
             scanf("%d",&data.selectedEnemyChestplate);
-         }while(!(isExpectedInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyChestplate)));
+         }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyChestplate)));
          do{
             printf("レギンス[なし:0,皮:1,チェーン:2,鉄:3,金:4,ダイヤ:5]:");
             scanf("%d",&data.selectedEnemyLeggins);
-         }while(!(isExpectedInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyLeggins)));
+         }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyLeggins)));
          do{
             printf("ブーツ[なし:0,皮:1,チェーン:2,鉄:3,金:4,ダイヤ:5]:");
             scanf("%d",&data.selectedEnemyBoots);
-         }while(!(isExpectedInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyBoots)));
+         }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyBoots)));
          printf("ヘルメット:%d\nチェストプレート:%d\nレギンス:%d\nブーツ:%d\n",data.selectedEnemyHelmet,data.selectedEnemyChestplate,data.selectedEnemyLeggins,data.selectedEnemyBoots);
          do{
             printf("これでよろしいでしょうか？[yes:y/no:n]");
@@ -190,19 +220,19 @@ int main(){
       case 0:
          break;
       case 1:
-         data.defenceValue += 1;
+         data.deffenceValue += 1;
          break;
       case 2:
-         data.defenceValue += 2;
+         data.deffenceValue += 2;
          break;
       case 3:
-         data.defenceValue += 2;
+         data.deffenceValue += 2;
          break;
       case 4:
-         data.defenceValue += 2;
+         data.deffenceValue += 2;
          break;
       case 5:
-         data.defenceValue += 3;
+         data.deffenceValue += 3;
          data.armorStrength += 2;
          break;
    }
@@ -211,19 +241,19 @@ int main(){
       case 0:
          break;
       case 1:
-         data.defenceValue += 3;
+         data.deffenceValue += 3;
          break;
       case 2:
-         data.defenceValue += 5;
+         data.deffenceValue += 5;
          break;
       case 3:
-         data.defenceValue += 5;
+         data.deffenceValue += 5;
          break;
       case 4:
-         data.defenceValue += 6;
+         data.deffenceValue += 6;
          break;
       case 5:
-         data.defenceValue += 8;
+         data.deffenceValue += 8;
          data.armorStrength += 2;
          break;
    }
@@ -232,19 +262,19 @@ int main(){
       case 0:
          break;
       case 1:
-         data.defenceValue += 2;
+         data.deffenceValue += 2;
          break;
       case 2:
-         data.defenceValue += 3;
+         data.deffenceValue += 3;
          break;
       case 3:
-         data.defenceValue += 4;
+         data.deffenceValue += 4;
          break;
       case 4:
-         data.defenceValue += 5;
+         data.deffenceValue += 5;
          break;
       case 5:
-         data.defenceValue += 6;
+         data.deffenceValue += 6;
          data.armorStrength += 2;
          break;
    }
@@ -253,19 +283,19 @@ int main(){
       case 0:
          break;
       case 1:
-         data.defenceValue += 1;
+         data.deffenceValue += 1;
          break;
       case 2:
-         data.defenceValue += 1;
+         data.deffenceValue += 1;
          break;
       case 3:
-         data.defenceValue += 1;
+         data.deffenceValue += 1;
          break;
       case 4:
-         data.defenceValue += 2;
+         data.deffenceValue += 2;
          break;
       case 5:
-         data.defenceValue += 3;
+         data.deffenceValue += 3;
          data.armorStrength += 2;
          break;
    }
@@ -278,12 +308,12 @@ int main(){
       printf("[0~200の整数値]:");
       scanf("%d", data.weaponEnchantLevel);
     data.weaponEnchantLevel = data.weaponEnchantLevel>20?20 : data.weaponEnchantLevel;
-   }while(!(isExpectedInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL,data.weaponEnchantLevel)));
+   }while(!(isExpectedIntInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL,data.weaponEnchantLevel)));
 
    display(DEBUG_SWITCH);
 
    //計算フェイズ
-   data.deffensivePower=MAX((data.defenceValue/125),((data.defenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
+   data.deffensivePower=MAX((data.deffenceValue/125),((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
    data.damage = (1- data.deffensivePower) * data.offensivePower;
    data.damage *= 1-(4 * data.weaponEnchantLevel)/100;
    //終了処理
@@ -297,8 +327,8 @@ int main(){
 }
 /*
 ダメージ計算式
-①ダメージ軽減割合＝(data.defenceValue-(data.offensivePower÷(2+data.armorStrength÷4)))÷25
-②ダメージ軽減割合＝data.defenceValue÷125
+①ダメージ軽減割合＝(data.deffenceValue-(data.offensivePower÷(2+data.armorStrength÷4)))÷25
+②ダメージ軽減割合＝data.deffenceValue÷125
 の高いほう
 
 上記ダメージ割合と攻撃側の攻撃力を乗算して実ダメージを割り出せる。
