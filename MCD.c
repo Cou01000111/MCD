@@ -79,6 +79,7 @@ void display(bool debag){//V
 }
 
 int main(){
+   system("chcp 65001");
    display(DEBUG_SWITCH);
 
 
