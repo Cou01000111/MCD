@@ -276,8 +276,8 @@ int main(){
       printf("ダメージ軽減エンチャントの合計レベルを入力してください\n");
       printf("[0~200の整数値]:");
       scanf("%d", data.weaponEnchantLevel);
-    data.weaponEnchantLevel = data.weaponEnchantLevel>20?20 data.weaponEnchantLevel;
-   }while(!(isExpectedInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL data.weaponEnchantLevel)));
+    data.weaponEnchantLevel = data.weaponEnchantLevel>20?20 : data.weaponEnchantLevel;
+   }while(!(isExpectedInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL,data.weaponEnchantLevel)));
 
    display(DEBUG_SWITCH);
 
