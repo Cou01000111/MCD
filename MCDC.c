@@ -54,8 +54,7 @@ dataSet data = {0};
 
 
 bool isExpectedIntInput(int min,int max,int value){//valueがmin~maxならtrueを返す
-   if((min <= value)&&(value <= max))return true;
-   else return false;
+   return ((min <= value)&&(value <= max));
 }
 
 bool isExpectedCharInput(char array[],char input){//inputがarray[]のどれかと同じだったらtrueを返す
@@ -70,13 +69,13 @@ bool yesNoJ(char yesNo){//yes
    else return false;
 }
 
-void display(bool debag){//V
+void display(bool debug){//V
    system("cls");
    for(int i = 0;i < DISPLAY_WIDTH;i++)printf("■");
    printf("\n");
    printf("現在の攻撃力(data.offensivePower)  : %5.1lf\n",data.offensivePower);
    printf("現在の防御力(data.deffensivePower) : ダメージ%5.1lf％カット\n",data.deffensivePower);
-   if(debag){
+   if(debug){
       printf("data.offensivePower:%lf\n",data.offensivePower);
       printf("data.deffensivePower:%lf\n",data.deffensivePower);
       printf("defence value:%d\n",data.deffenceValue);
@@ -84,7 +83,9 @@ void display(bool debag){//V
       printf("(data.deffenceValue/125):%lf\n",(data.deffenceValue/125));
       printf("((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25):%lf\n",((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
    }
-   for(int i = 0;i < DISPLAY_WIDTH;i++)printf("■");
+   for(int i = 0;i < DISPLAY_WIDTH;i++){
+      printf("■");
+   }
    printf("\n");
 }
 
