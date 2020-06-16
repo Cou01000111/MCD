@@ -86,7 +86,7 @@ void display(bool debug){//V
    for(int i = 0;i < DISPLAY_WIDTH;i++){
       printf("■");
    }
-   printf("\n");
+   puts("");
 }
 
 
