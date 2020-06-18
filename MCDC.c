@@ -21,7 +21,7 @@
 #define MIN_SELECTED_ENEMY 0
 #define MAX_SELECTED_ARMOR 5
 #define MIN_SELECTED_ARMOR 0
-#define MAX_ENCHANT_LEVEL 37000
+#define MAX_ENCHANT_LEVEL 40000
 #define MIN_ENCHANT_LEVEL 0
 
 #define DISPLAY_WIDTH 70
@@ -89,7 +89,7 @@ void display(bool debug){//V
       printf("armor strength:%lf\n",data.armorStrength);
       printf("(data.deffenceValue/125):%lf\n",(data.deffenceValue/125));
       printf("((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25):%lf\n",((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
-      printf("/summon command:\n  /summon minecraft:skeleton ~ ~ ~ {Silent:1b,NoAI:1b,CanPickUpLoot:0b%s,Attributes:[{Name:generic.armor,Base:%d}]}\n",armorCommand,data.armor);
+      printf("/summon command:\nsummon minecraft:skeleton ~ ~ ~ {Silent:1b,NoAI:1b,CanPickUpLoot:0b,%sAttributes:[{Name:generic.armor,Base:%d}]}\n",armorCommand,data.armor);
    }
    for(int i = 0;i < DISPLAY_WIDTH;i++){
       printf("■");
@@ -345,23 +345,23 @@ int main(){
       strcat(armorCommand,armorCommands[0]);
       strcat(armorCommand,"}],");
    }
-   display(DEBUG_SWITCH);
+   display(DEBUG_SWITCH);//実行されている（確信）
    //ダメージ軽減エンチャント
 
    do{
       printf("ダメージ軽減エンチャントの合計レベルを入力してください\n");
       printf("[0~200の整数値]:");
-      scanf("%d", data.weaponEnchantLevel);
-    data.weaponEnchantLevel = (data.weaponEnchantLevel > 20) ? 20 : data.weaponEnchantLevel;
-   }while(!(isExpectedIntInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL,data.weaponEnchantLevel)));
+      scanf("%d", data.weaponEnchantLevel);//ここの5行に犯人がいる！！！！！
+      data.weaponEnchantLevel = (data.weaponEnchantLevel > 20) ? 20 : data.weaponEnchantLevel;//ここの5行に犯人がいる！！！！！
+   }while(!(isExpectedIntInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL,data.weaponEnchantLevel)));//ここの5行に犯人がいる！！！！！
 
-   display(DEBUG_SWITCH);
+   display(DEBUG_SWITCH);//実行されてない（確信）
 
    //計算フェイズ
    data.deffenceValue += data.armor;
-   data.deffensivePower=MAX((data.deffenceValue/125),((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
-   data.damage = (1- data.deffensivePower) * data.offensivePower;
-   data.damage *= 1-(4 * data.weaponEnchantLevel)/100;
+   data.deffensivePower = MAX((data.deffenceValue/125),((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
+   data.damage = (1-data.deffensivePower) * data.offensivePower;
+   data.damage *= 1 - (4*data.weaponEnchantLevel)/100;
    //終了処理
    display(DEBUG_SWITCH);
    printf("貴方が相手に与えられるダメージは %.8lf です\n",data.damage);
