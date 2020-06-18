@@ -55,8 +55,8 @@ dataSet data = {
    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-char armorCommand[1024]={""};
-char armorCommands[4][256]={""};
+char armorCommand[1024] = "";
+char armorCommands[4][256];
 
 bool isExpectedIntInput(int min,int max,int value){//valueがmin~maxならtrueを返す
    return ((min <= value)&&(value <= max));
@@ -102,7 +102,6 @@ void display(bool debug){//V
 int main(){
    system("chcp 65001");
    display(DEBUG_SWITCH);
-
 
    //武器
    char allowedChars[NUMBER_OF_WEAPONS] = {'n','w','g','s','i','d'};
@@ -224,12 +223,7 @@ int main(){
          }while(!(yesNo == 'y' || yesNo == 'n'));
       }while(!(yesNoJ(yesNo)));
    };
-   if(data.selectedEnemyHelmet||
-   data.selectedEnemyChestplate||
-   data.selectedEnemyLeggings||
-   data.selectedEnemyBoots){
-      armorCommand={"ArmorItems:[{},{},{},{}],"}
-   }
+
    //防御点-加算(ついでに防具強度計算)
    //Helmet
    switch(data.selectedEnemyHelmet){
@@ -237,24 +231,24 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 1;
-         armorCommands[0] = "id:\"minecraft:leather_helmet\"";
+         strcat(armorCommands[0],"id:\"minecraft:leather_helmet\"");
          break;
       case 2:
          data.deffenceValue += 2;
-         armorCommands[0] = "id:\"minecraft:chainmail_helmet\"";
+         strcat(armorCommands[0],"id:\"minecraft:chainmail_helmet\"");
          break;
       case 3:
          data.deffenceValue += 2;
-         armorCommands[0] = "id:\"minecraft:iron_helmet\"";
+         strcat(armorCommands[0],"id:\"minecraft:iron_helmet\"");
          break;
       case 4:
          data.deffenceValue += 2;
-         armorCommands[0] = "id:\"minecraft:gold_helmet\"";
+         strcat(armorCommands[0],"id:\"minecraft:gold_helmet\"");
          break;
       case 5:
          data.deffenceValue += 3;
          data.armorStrength += 2;
-         armorCommands[0] = "id:\"minecraft:diamond_helmet\"";
+         strcat(armorCommands[0],"id:\"minecraft:diamond_helmet\"");
          break;
    }
    //Chestplate
@@ -263,24 +257,24 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 3;
-         armorCommands[1] = "id:\"minecraft:_chestplate\"";
+         strcat(armorCommands[1],"id:\"minecraft:leather_chestplate\"");
          break;
       case 2:
          data.deffenceValue += 5;
-         armorCommands[1] = "id:\"minecraft:_chestplate\"";
+         strcat(armorCommands[1],"id:\"minecraft:chainmail_chestplate\"");
          break;
       case 3:
          data.deffenceValue += 5;
-         armorCommands[1] = "id:\"minecraft:_chestplate\"";
+         strcat(armorCommands[1],"id:\"minecraft:iron_chestplate\"");
          break;
       case 4:
          data.deffenceValue += 6;
-         armorCommands[1] = "id:\"minecraft:_chestplate\"";
+         strcat(armorCommands[1],"id:\"minecraft:gold_chestplate\"");
          break;
       case 5:
          data.deffenceValue += 8;
          data.armorStrength += 2;
-         armorCommands[1] = "id:\"minecraft:_chestplate\"";
+         strcat(armorCommands[1],"id:\"minecraft:diamond_chestplate\"");
          break;
    }
    //Leggings
@@ -289,24 +283,24 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 2;
-         armorCommands[2] = "id:\"minecraft:_leggings\"";
+         strcat(armorCommands[2],"id:\"minecraft:leather_leggings\"");
          break;
       case 2:
          data.deffenceValue += 3;
-         armorCommands[2] = "id:\"minecraft:_leggings\"";
+         strcat(armorCommands[2],"id:\"minecraft:chainmail_leggings\"");
          break;
       case 3:
          data.deffenceValue += 4;
-         armorCommands[2] = "id:\"minecraft:_leggings\"";
+         strcat(armorCommands[2],"id:\"minecraft:iron_leggings\"");
          break;
       case 4:
          data.deffenceValue += 5;
-         armorCommands[2] = "id:\"minecraft:_leggings\"";
+         strcat(armorCommands[2],"id:\"minecraft:gold_leggings\"");
          break;
       case 5:
          data.deffenceValue += 6;
          data.armorStrength += 2;
-         armorCommands[2] = "id:\"minecraft:_leggings\"";
+         strcat(armorCommands[2],"id:\"minecraft:diamond_leggings\"");
          break;
    }
    //Boots
@@ -315,27 +309,42 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 1;
-         armorCommands[3] = "id:\"minecraft:_boots\"";
+         strcat(armorCommands[3],"id:\"minecraft:leather_boots\"");
          break;
       case 2:
          data.deffenceValue += 1;
-         armorCommands[3] = "id:\"minecraft:_boots\"";
+         strcat(armorCommands[3],"id:\"minecraft:chainmail_boots\"");
          break;
       case 3:
          data.deffenceValue += 1;
-         armorCommands[3] = "id:\"minecraft:_boots\"";
+         strcat(armorCommands[3],"id:\"minecraft:iron_boots\"");
          break;
       case 4:
          data.deffenceValue += 2;
-         armorCommands [3]= "id:\"minecraft:_\boots"";
+         strcat(armorCommands[3],"id:\"minecraft:gold_boots\"");
          break;
       case 5:
          data.deffenceValue += 3;
          data.armorStrength += 2;
-         armorCommands[3] = "id:\"minecraft:_boots\"";
+         strcat(armorCommands[3],"id:\"minecraft:diamond_boots\"");
          break;
    }
 
+   //防具関係のコマンドを生成
+   if(data.selectedEnemyHelmet||
+   data.selectedEnemyChestplate||
+   data.selectedEnemyLeggings||
+   data.selectedEnemyBoots){
+      strcat(armorCommand,"ArmorItems:[{");
+      strcat(armorCommand,armorCommands[3]);
+      strcat(armorCommand,"},{");
+      strcat(armorCommand,armorCommands[2]);
+      strcat(armorCommand,"},{");
+      strcat(armorCommand,armorCommands[1]);
+      strcat(armorCommand,"},{");
+      strcat(armorCommand,armorCommands[0]);
+      strcat(armorCommand,"}],");
+   }
    display(DEBUG_SWITCH);
    //ダメージ軽減エンチャント
 
@@ -343,7 +352,7 @@ int main(){
       printf("ダメージ軽減エンチャントの合計レベルを入力してください\n");
       printf("[0~200の整数値]:");
       scanf("%d", data.weaponEnchantLevel);
-    data.weaponEnchantLevel = data.weaponEnchantLevel>20?20 : data.weaponEnchantLevel;
+    data.weaponEnchantLevel = (data.weaponEnchantLevel > 20) ? 20 : data.weaponEnchantLevel;
    }while(!(isExpectedIntInput(MIN_ENCHANT_LEVEL,MAX_ENCHANT_LEVEL,data.weaponEnchantLevel)));
 
    display(DEBUG_SWITCH);
