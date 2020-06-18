@@ -36,8 +36,8 @@ char yesNo;
 typedef struct{
    double offensivePower;
    double deffensivePower;
-   int deffenceValue;//防御力
-   int armorStrength;//防具強度
+   double deffenceValue;//防御力
+   double armorStrength;//防具強度
    char selectedWeapon;
    double strengthLevel;
    int sharpnessEnchantLevel;
@@ -78,8 +78,8 @@ void display(bool debug){//V
    if(debug){
       printf("data.offensivePower:%lf\n",data.offensivePower);
       printf("data.deffensivePower:%lf\n",data.deffensivePower);
-      printf("defence value:%d\n",data.deffenceValue);
-      printf("armor strength:%d\n",data.armorStrength);
+      printf("defence value:%lf\n",data.deffenceValue);
+      printf("armor strength:%lf\n",data.armorStrength);
       printf("(data.deffenceValue/125):%lf\n",(data.deffenceValue/125));
       printf("((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25):%lf\n",((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
    }
