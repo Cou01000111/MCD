@@ -37,6 +37,7 @@ typedef struct{
    double offensivePower;
    double deffensivePower;
    double deffenceValue;//防御力
+   int armor;//素防御力
    double armorStrength;//防具強度
    char selectedWeapon;
    double strengthLevel;
@@ -44,14 +45,18 @@ typedef struct{
    short selectedEnemy;
    int selectedEnemyHelmet,
        selectedEnemyChestplate,
-       selectedEnemyLeggins,
+       selectedEnemyLeggings,
        selectedEnemyBoots;
    int weaponEnchantLevel;
    double damage;
 }dataSet;
 
-dataSet data = {0};
+dataSet data = {
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
 
+char armorCommand[1024]={""};
+char armorCommands[4][256]={""};
 
 bool isExpectedIntInput(int min,int max,int value){//valueがmin~maxならtrueを返す
    return ((min <= value)&&(value <= max));
@@ -71,7 +76,9 @@ bool yesNoJ(char yesNo){//yes
 
 void display(bool debug){//V
    system("cls");
-   for(int i = 0;i < DISPLAY_WIDTH;i++)printf("■");
+   for(int i = 0;i < DISPLAY_WIDTH;i++){
+      printf("■");
+   }
    printf("\n");
    printf("現在の攻撃力(data.offensivePower)  : %5.1lf\n",data.offensivePower);
    printf("現在の防御力(data.deffensivePower) : ダメージ%5.1lf％カット\n",data.deffensivePower);
@@ -82,6 +89,7 @@ void display(bool debug){//V
       printf("armor strength:%lf\n",data.armorStrength);
       printf("(data.deffenceValue/125):%lf\n",(data.deffenceValue/125));
       printf("((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25):%lf\n",((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
+      printf("/summon command:\n  /summon minecraft:skeleton ~ ~ ~ {Silent:1b,NoAI:1b,CanPickUpLoot:0b%s,Attributes:[{Name:generic.armor,Base:%d}]}\n",armorCommand,data.armor);
    }
    for(int i = 0;i < DISPLAY_WIDTH;i++){
       printf("■");
@@ -153,6 +161,7 @@ int main(){
 
    //防御点-素
 
+   bool needToChangeNBT = false;
    do{
       printf("敵の種類を選んでください\n");
       printf("[ゾンビ,ゾンビピックマン,村人ゾンビ,ハスク,ドラウンド:1\nマグマキューブ（小:2\nウィザー:3\nマグマキューブ（中）:4\nマグマキューブ（大）:5\n殺人ウサギ:6\nシュルカー（殻を閉じている時）:7\nその他:0]:");
@@ -160,28 +169,28 @@ int main(){
    }while(!(isExpectedIntInput(MIN_SELECTED_ENEMY,MAX_SELECTED_ENEMY,data.selectedEnemy)));
    switch (data.selectedEnemy){
    case 0:
-      data.deffenceValue += 0;
+      data.armor += 0;
       break;
    case 1:
-      data.deffenceValue += 2;
+      data.armor += 2;
       break;
    case 2:
-      data.deffenceValue += 3;
+      data.armor += 3;
       break;
    case 3:
-      data.deffenceValue += 4;
+      data.armor += 4;
       break;
    case 4:
-      data.deffenceValue += 6;
+      data.armor += 6;
       break;
    case 5:
-      data.deffenceValue += 8;
+      data.armor += 8;
       break;
    case 6:
-      data.deffenceValue += 12;
+      data.armor += 12;
       break;
    case 7:
-      data.deffenceValue += 20;
+      data.armor += 20;
       break;
    };
 
@@ -202,19 +211,25 @@ int main(){
          }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyChestplate)));
          do{
             printf("レギンス[なし:0,皮:1,チェーン:2,鉄:3,金:4,ダイヤ:5]:");
-            scanf("%d",&data.selectedEnemyLeggins);
-         }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyLeggins)));
+            scanf("%d",&data.selectedEnemyLeggings);
+         }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyLeggings)));
          do{
             printf("ブーツ[なし:0,皮:1,チェーン:2,鉄:3,金:4,ダイヤ:5]:");
             scanf("%d",&data.selectedEnemyBoots);
          }while(!(isExpectedIntInput(MIN_SELECTED_ARMOR,MAX_SELECTED_ARMOR,data.selectedEnemyBoots)));
-         printf("ヘルメット:%d\nチェストプレート:%d\nレギンス:%d\nブーツ:%d\n",data.selectedEnemyHelmet,data.selectedEnemyChestplate,data.selectedEnemyLeggins,data.selectedEnemyBoots);
+         printf("ヘルメット:%d\nチェストプレート:%d\nレギンス:%d\nブーツ:%d\n",data.selectedEnemyHelmet,data.selectedEnemyChestplate,data.selectedEnemyLeggings,data.selectedEnemyBoots);
          do{
             printf("これでよろしいでしょうか？[yes:y/no:n]");
             scanf(" %c",&yesNo);
          }while(!(yesNo == 'y' || yesNo == 'n'));
       }while(!(yesNoJ(yesNo)));
    };
+   if(data.selectedEnemyHelmet||
+   data.selectedEnemyChestplate||
+   data.selectedEnemyLeggings||
+   data.selectedEnemyBoots){
+      armorCommand={"ArmorItems:[{},{},{},{}],"}
+   }
    //防御点-加算(ついでに防具強度計算)
    //Helmet
    switch(data.selectedEnemyHelmet){
@@ -222,19 +237,24 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 1;
+         armorCommands[0] = "id:\"minecraft:leather_helmet\"";
          break;
       case 2:
          data.deffenceValue += 2;
+         armorCommands[0] = "id:\"minecraft:chainmail_helmet\"";
          break;
       case 3:
          data.deffenceValue += 2;
+         armorCommands[0] = "id:\"minecraft:iron_helmet\"";
          break;
       case 4:
          data.deffenceValue += 2;
+         armorCommands[0] = "id:\"minecraft:gold_helmet\"";
          break;
       case 5:
          data.deffenceValue += 3;
          data.armorStrength += 2;
+         armorCommands[0] = "id:\"minecraft:diamond_helmet\"";
          break;
    }
    //Chestplate
@@ -243,40 +263,50 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 3;
+         armorCommands[1] = "id:\"minecraft:_chestplate\"";
          break;
       case 2:
          data.deffenceValue += 5;
+         armorCommands[1] = "id:\"minecraft:_chestplate\"";
          break;
       case 3:
          data.deffenceValue += 5;
+         armorCommands[1] = "id:\"minecraft:_chestplate\"";
          break;
       case 4:
          data.deffenceValue += 6;
+         armorCommands[1] = "id:\"minecraft:_chestplate\"";
          break;
       case 5:
          data.deffenceValue += 8;
          data.armorStrength += 2;
+         armorCommands[1] = "id:\"minecraft:_chestplate\"";
          break;
    }
-   //Leggins
-   switch(data.selectedEnemyLeggins){
+   //Leggings
+   switch(data.selectedEnemyLeggings){
       case 0:
          break;
       case 1:
          data.deffenceValue += 2;
+         armorCommands[2] = "id:\"minecraft:_leggings\"";
          break;
       case 2:
          data.deffenceValue += 3;
+         armorCommands[2] = "id:\"minecraft:_leggings\"";
          break;
       case 3:
          data.deffenceValue += 4;
+         armorCommands[2] = "id:\"minecraft:_leggings\"";
          break;
       case 4:
          data.deffenceValue += 5;
+         armorCommands[2] = "id:\"minecraft:_leggings\"";
          break;
       case 5:
          data.deffenceValue += 6;
          data.armorStrength += 2;
+         armorCommands[2] = "id:\"minecraft:_leggings\"";
          break;
    }
    //Boots
@@ -285,19 +315,24 @@ int main(){
          break;
       case 1:
          data.deffenceValue += 1;
+         armorCommands[3] = "id:\"minecraft:_boots\"";
          break;
       case 2:
          data.deffenceValue += 1;
+         armorCommands[3] = "id:\"minecraft:_boots\"";
          break;
       case 3:
          data.deffenceValue += 1;
+         armorCommands[3] = "id:\"minecraft:_boots\"";
          break;
       case 4:
          data.deffenceValue += 2;
+         armorCommands [3]= "id:\"minecraft:_\boots"";
          break;
       case 5:
          data.deffenceValue += 3;
          data.armorStrength += 2;
+         armorCommands[3] = "id:\"minecraft:_boots\"";
          break;
    }
 
@@ -314,6 +349,7 @@ int main(){
    display(DEBUG_SWITCH);
 
    //計算フェイズ
+   data.deffenceValue += data.armor;
    data.deffensivePower=MAX((data.deffenceValue/125),((data.deffenceValue-(data.offensivePower/(2+data.armorStrength/4)))/25));
    data.damage = (1- data.deffensivePower) * data.offensivePower;
    data.damage *= 1-(4 * data.weaponEnchantLevel)/100;
